@@ -1,0 +1,104 @@
+<div class="users-container">
+  <h2>{{ translate.translate('users.title') }}</h2>
+
+  <div *ngIf="!isSuperAdmin()" class="access-denied">
+    <p>Access denied. SuperAdmin role required to manage users.</p>
+  </div>
+
+  <div *ngIf="isSuperAdmin()">
+    <div class="actions">
+      <button (click)="addUser()" class="btn btn-primary">{{ translate.translate('users.add') }}</button>
+    </div>
+
+    <div *ngIf="showUserForm" class="user-form">
+      <h3>{{ isEditing ? translate.translate('users.edit') : translate.translate('users.add') }}</h3>
+      <form (ngSubmit)="saveUser()">
+        <div class="form-group">
+          <label>{{ translate.translate('users.username') }} *</label>
+          <input type="text" [(ngModel)]="userForm.username" name="username" required />
+        </div>
+        <div class="form-group">
+          <label>{{ translate.translate('users.email') }} *</label>
+          <input type="email" [(ngModel)]="userForm.email" name="email" required />
+        </div>
+        <div class="form-group" *ngIf="!isEditing">
+          <label>{{ translate.translate('users.password') }} *</label>
+          <input type="password" [(ngModel)]="userForm.password" name="password" required />
+        </div>
+        <div class="form-group">
+          <label>{{ translate.translate('users.role') }} *</label>
+          <select [(ngModel)]="userForm.role" name="role" required>
+            <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="userForm.isActive" name="isActive" />
+            {{ translate.translate('users.active') }}
+          </label>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">{{ translate.translate('common.save') }}</button>
+          <button type="button" (click)="cancelForm()" class="btn btn-secondary">{{ translate.translate('common.cancel') }}</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="users-list">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ translate.translate('users.username') }}</th>
+            <th>{{ translate.translate('users.email') }}</th>
+            <th>{{ translate.translate('users.role') }}</th>
+            <th>{{ translate.translate('users.active') }}</th>
+            <th>{{ translate.translate('users.lastLogin') }}</th>
+            <th>{{ translate.translate('users.actions') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.role }}</td>
+            <td>{{ user.isActive ? translate.translate('users.yes') : translate.translate('users.no') }}</td>
+            <td>{{ user.lastLoginDate ? (user.lastLoginDate | localDate:'short') : translate.translate('users.never') }}</td>
+            <td>
+              <button (click)="editUser(user)" class="btn btn-sm btn-primary">{{ translate.translate('common.edit') }}</button>
+              <button (click)="deleteUser(user)" class="btn btn-sm btn-danger">{{ translate.translate('common.delete') }}</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <!-- Pagination Controls -->
+      <div class="pagination" *ngIf="totalCount > 0">
+        <div class="pagination-info">
+          <span>{{ translate.translate('pagination.showing') }} {{ (currentPage - 1) * pageSize + 1 }} {{ translate.translate('pagination.to') }} {{ Math.min(currentPage * pageSize, totalCount) }} {{ translate.translate('pagination.of') }} {{ totalCount }} users</span>
+          <select [(ngModel)]="pageSize" (change)="changePageSize(pageSize)" class="page-size-select">
+            <option [value]="10">10 {{ translate.translate('pagination.perPage') }}</option>
+            <option [value]="25">25 {{ translate.translate('pagination.perPage') }}</option>
+            <option [value]="50">50 {{ translate.translate('pagination.perPage') }}</option>
+            <option [value]="100">100 {{ translate.translate('pagination.perPage') }}</option>
+          </select>
+        </div>
+        <div class="pagination-buttons">
+          <button (click)="goToPage(1)" [disabled]="!hasPreviousPage" class="btn btn-sm">{{ translate.translate('pagination.first') }}</button>
+          <button (click)="goToPage(currentPage - 1)" [disabled]="!hasPreviousPage" class="btn btn-sm">{{ translate.translate('pagination.previous') }}</button>
+          <span class="page-numbers">
+            <button 
+              *ngFor="let page of getPageNumbers()" 
+              (click)="goToPage(page)"
+              [class.active]="page === currentPage"
+              class="btn btn-sm">
+              {{ page }}
+            </button>
+          </span>
+          <button (click)="goToPage(currentPage + 1)" [disabled]="!hasNextPage" class="btn btn-sm">{{ translate.translate('pagination.next') }}</button>
+          <button (click)="goToPage(totalPages)" [disabled]="!hasNextPage" class="btn btn-sm">{{ translate.translate('pagination.last') }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

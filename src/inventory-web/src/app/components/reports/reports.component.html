@@ -1,0 +1,186 @@
+<div class="reports-container">
+  <h1>{{ translate.translate('reports.title') }}</h1>
+
+  <div class="tabs">
+    <button [class.active]="activeTab === 'stock'" (click)="generateStockReport()" class="tab-btn">{{ translate.translate('reports.currentStock') }}</button>
+    <button [class.active]="activeTab === 'lowStock'" (click)="generateLowStockReport()" class="tab-btn">{{ translate.translate('reports.lowStock') }}</button>
+    <button [class.active]="activeTab === 'movements'" (click)="generateMovementReport()" class="tab-btn">{{ translate.translate('reports.movementHistory') }}</button>
+  </div>
+
+  <!-- Stock Report -->
+  <div *ngIf="activeTab === 'stock'" class="report-section">
+    <div class="report-header">
+      <h2>{{ translate.translate('reports.currentStock') }}</h2>
+      <button (click)="exportStockReport()" class="btn btn-primary" [disabled]="stockReport.length === 0">
+        {{ translate.translate('reports.export') }}
+      </button>
+    </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ translate.translate('products.sku') }}</th>
+            <th>{{ translate.translate('products.name') }}</th>
+            <th>{{ translate.translate('products.category') }}</th>
+            <th>{{ translate.translate('products.quantity') }}</th>
+            <th>{{ translate.translate('products.price') }}</th>
+            <th>{{ translate.translate('products.lowStock') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of stockReport">
+            <td>{{ product.sku }}</td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.categoryName || '-' }}</td>
+            <td>{{ product.quantity }}</td>
+            <td>${{ product.price.toFixed(2) }}</td>
+            <td>{{ product.isLowStock ? translate.translate('common.yes') : translate.translate('common.no') }}</td>
+          </tr>
+          <tr *ngIf="stockReport.length === 0">
+            <td colspan="6" class="text-center">{{ translate.translate('products.noProducts') }}</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <!-- Pagination Controls -->
+      <div class="pagination" *ngIf="stockTotalCount > 0">
+        <div class="pagination-info">
+          <span>{{ translate.translate('pagination.showing') }} {{ (stockCurrentPage - 1) * stockPageSize + 1 }} {{ translate.translate('pagination.to') }} {{ Math.min(stockCurrentPage * stockPageSize, stockTotalCount) }} {{ translate.translate('pagination.of') }} {{ stockTotalCount }} products</span>
+          <select [(ngModel)]="stockPageSize" (change)="stockChangePageSize(stockPageSize)" class="page-size-select">
+            <option [value]="10">10 {{ translate.translate('pagination.perPage') }}</option>
+            <option [value]="25">25 {{ translate.translate('pagination.perPage') }}</option>
+            <option [value]="50">50 {{ translate.translate('pagination.perPage') }}</option>
+            <option [value]="100">100 {{ translate.translate('pagination.perPage') }}</option>
+          </select>
+        </div>
+        <div class="pagination-buttons" *ngIf="stockTotalPages > 1">
+          <button (click)="stockGoToPage(1)" [disabled]="!stockHasPreviousPage" class="btn btn-sm">{{ translate.translate('pagination.first') }}</button>
+          <button (click)="stockGoToPage(stockCurrentPage - 1)" [disabled]="!stockHasPreviousPage" class="btn btn-sm">{{ translate.translate('pagination.previous') }}</button>
+          <span class="page-numbers">
+            <button 
+              *ngFor="let page of stockGetPageNumbers()" 
+              (click)="stockGoToPage(page)"
+              [class.active]="page === stockCurrentPage"
+              class="btn btn-sm">
+              {{ page }}
+            </button>
+          </span>
+          <button (click)="stockGoToPage(stockCurrentPage + 1)" [disabled]="!stockHasNextPage" class="btn btn-sm">{{ translate.translate('pagination.next') }}</button>
+          <button (click)="stockGoToPage(stockTotalPages)" [disabled]="!stockHasNextPage" class="btn btn-sm">{{ translate.translate('pagination.last') }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Low Stock Report -->
+  <div *ngIf="activeTab === 'lowStock'" class="report-section">
+    <div class="report-header">
+      <h2>{{ translate.translate('reports.lowStock') }}</h2>
+      <button (click)="exportLowStockReport()" class="btn btn-primary" [disabled]="lowStockReport.length === 0">
+        {{ translate.translate('reports.export') }}
+      </button>
+    </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ translate.translate('products.sku') }}</th>
+            <th>{{ translate.translate('products.name') }}</th>
+            <th>{{ translate.translate('products.category') }}</th>
+            <th>{{ translate.translate('products.quantity') }}</th>
+            <th>Threshold</th>
+            <th>{{ translate.translate('products.price') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of lowStockReport">
+            <td>{{ product.sku }}</td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.categoryName || '-' }}</td>
+            <td>{{ product.quantity }}</td>
+            <td>{{ product.minimumStockLevel }}</td>
+            <td>${{ product.price.toFixed(2) }}</td>
+          </tr>
+          <tr *ngIf="lowStockReport.length === 0">
+            <td colspan="6" class="text-center">{{ translate.translate('products.noProducts') }}</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <!-- Pagination Controls -->
+      <div class="pagination" *ngIf="lowStockTotalCount > 0">
+        <div class="pagination-info">
+          <span>{{ translate.translate('pagination.showing') }} {{ (lowStockCurrentPage - 1) * lowStockPageSize + 1 }} {{ translate.translate('pagination.to') }} {{ Math.min(lowStockCurrentPage * lowStockPageSize, lowStockTotalCount) }} {{ translate.translate('pagination.of') }} {{ lowStockTotalCount }} products</span>
+          <select [(ngModel)]="lowStockPageSize" (change)="lowStockChangePageSize(lowStockPageSize)" class="page-size-select">
+            <option [value]="10">10 {{ translate.translate('pagination.perPage') }}</option>
+            <option [value]="25">25 {{ translate.translate('pagination.perPage') }}</option>
+            <option [value]="50">50 {{ translate.translate('pagination.perPage') }}</option>
+            <option [value]="100">100 {{ translate.translate('pagination.perPage') }}</option>
+          </select>
+        </div>
+        <div class="pagination-buttons" *ngIf="lowStockTotalPages > 1">
+          <button (click)="lowStockGoToPage(1)" [disabled]="!lowStockHasPreviousPage" class="btn btn-sm">{{ translate.translate('pagination.first') }}</button>
+          <button (click)="lowStockGoToPage(lowStockCurrentPage - 1)" [disabled]="!lowStockHasPreviousPage" class="btn btn-sm">{{ translate.translate('pagination.previous') }}</button>
+          <span class="page-numbers">
+            <button 
+              *ngFor="let page of lowStockGetPageNumbers()" 
+              (click)="lowStockGoToPage(page)"
+              [class.active]="page === lowStockCurrentPage"
+              class="btn btn-sm">
+              {{ page }}
+            </button>
+          </span>
+          <button (click)="lowStockGoToPage(lowStockCurrentPage + 1)" [disabled]="!lowStockHasNextPage" class="btn btn-sm">{{ translate.translate('pagination.next') }}</button>
+          <button (click)="lowStockGoToPage(lowStockTotalPages)" [disabled]="!lowStockHasNextPage" class="btn btn-sm">{{ translate.translate('pagination.last') }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Movement History Report -->
+  <div *ngIf="activeTab === 'movements'" class="report-section">
+    <div class="report-header">
+      <h2>{{ translate.translate('reports.movementHistory') }}</h2>
+      <button (click)="exportMovementReport()" class="btn btn-primary" [disabled]="movementReport.length === 0">
+        {{ translate.translate('reports.export') }}
+      </button>
+    </div>
+    <div class="date-range">
+      <label>{{ translate.translate('reports.startDate') }}:</label>
+      <input type="date" [(ngModel)]="startDate">
+      <label>{{ translate.translate('reports.endDate') }}:</label>
+      <input type="date" [(ngModel)]="endDate">
+      <button (click)="generateMovementReport()" class="btn btn-secondary">{{ translate.translate('reports.generate') }}</button>
+    </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ translate.translate('stockMovements.date') }}</th>
+            <th>{{ translate.translate('stockMovements.product') }}</th>
+            <th>{{ translate.translate('stockMovements.type') }}</th>
+            <th>{{ translate.translate('stockMovements.quantity') }}</th>
+            <th>{{ translate.translate('stockMovements.createdBy') }}</th>
+            <th>{{ translate.translate('stockMovements.reason') }}</th>
+            <th>{{ translate.translate('stockMovements.notes') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let movement of movementReport">
+            <td>{{ movement.createdAt | localDate:'short' }}</td>
+            <td>{{ movement.productName }}</td>
+            <td>{{ getMovementTypeName(movement.movementType) }}</td>
+            <td>{{ movement.quantity }}</td>
+            <td>{{ movement.createdBy || '-' }}</td>
+            <td>{{ movement.reason || '-' }}</td>
+            <td>{{ movement.notes || '-' }}</td>
+          </tr>
+          <tr *ngIf="movementReport.length === 0">
+            <td colspan="7" class="text-center">{{ translate.translate('stockMovements.noMovements') }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+

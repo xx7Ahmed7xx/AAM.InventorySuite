@@ -1,0 +1,399 @@
+<UserControl x:Class="Inventory.Desktop.Views.ReportsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:Inventory.Desktop.Converters"
+             xmlns:translation="clr-namespace:Inventory.Desktop.Converters">
+    <UserControl.Resources>
+        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
+        <converters:UtcToLocalDateConverter x:Key="UtcToLocalDateConverter"/>
+    </UserControl.Resources>
+    <Grid Margin="10">
+        <TabControl>
+            <!-- Stock Report Tab -->
+            <TabItem>
+                <TabItem.Header>
+                    <translation:TranslationExtension Key="reports.currentStock"/>
+                </TabItem.Header>
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                        <Button Command="{Binding GenerateStockReportCommand}" Margin="0,0,10,0" Padding="10,5">
+                            <Button.Content>
+                                <translation:TranslationExtension Key="reports.generate"/>
+                            </Button.Content>
+                        </Button>
+                        <Button Command="{Binding ExportStockReportCommand}" Padding="10,5">
+                            <Button.Content>
+                                <translation:TranslationExtension Key="reports.export"/>
+                            </Button.Content>
+                        </Button>
+                    </StackPanel>
+
+                    <DataGrid Grid.Row="1" 
+                             ItemsSource="{Binding StockReport}" 
+                             AutoGenerateColumns="False"
+                             IsReadOnly="True"
+                             GridLinesVisibility="All"
+                             HeadersVisibility="Column">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding SKU}" Width="100">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="products.sku"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding Name}" Width="*">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="products.name"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding CategoryName}" Width="120">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="products.category"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding Quantity}" Width="80">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="products.quantity"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding Price, StringFormat=C}" Width="100">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="products.price"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding IsLowStock}" Width="80">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="products.lowStock"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    
+                    <!-- Pagination Controls -->
+                    <Grid Grid.Row="2" Margin="0,10,0,0">
+                        <Grid.Visibility>
+                            <MultiBinding Converter="{StaticResource CountToVisibilityConverter}">
+                                <Binding Path="StockTotalCount"/>
+                                <Binding Path="StockPageSize"/>
+                            </MultiBinding>
+                        </Grid.Visibility>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding StockPaginationInfo}" Margin="0,0,15,0" VerticalAlignment="Center"/>
+                            <TextBlock VerticalAlignment="Center" Margin="0,0,5,0">
+                                <TextBlock.Inlines>
+                                    <Run>
+                                        <Run.Text>
+                                            <translation:TranslationExtension Key="pagination.pageSize"/>
+                                        </Run.Text>
+                                    </Run>
+                                    <Run Text=":"/>
+                                </TextBlock.Inlines>
+                            </TextBlock>
+                            <ComboBox SelectedValue="{Binding StockPageSize, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Tag" Width="100" VerticalContentAlignment="Center">
+                                <ComboBox.Items>
+                                    <ComboBoxItem Content="10" Tag="10"/>
+                                    <ComboBoxItem Content="25" Tag="25"/>
+                                    <ComboBoxItem Content="50" Tag="50"/>
+                                    <ComboBoxItem Content="100" Tag="100"/>
+                                </ComboBox.Items>
+                            </ComboBox>
+                            <Button Command="{Binding StockChangePageSizeCommand}" 
+                                    Margin="5,0,0,0" Padding="10,5">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="pagination.apply"/>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+                        
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Button Command="{Binding StockFirstPageCommand}" 
+                                    Margin="0,0,5,0" Padding="10,5" IsEnabled="{Binding StockHasPreviousPage}">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="pagination.first"/>
+                                </Button.Content>
+                            </Button>
+                            <Button Command="{Binding StockPreviousPageCommand}" 
+                                    Margin="0,0,5,0" Padding="10,5" IsEnabled="{Binding StockHasPreviousPage}">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="pagination.previous"/>
+                                </Button.Content>
+                            </Button>
+                            <TextBlock VerticalAlignment="Center" Margin="5,0">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} / {1}">
+                                        <Binding Path="StockCurrentPage"/>
+                                        <Binding Path="StockTotalPages"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                            <Button Command="{Binding StockNextPageCommand}" 
+                                    Margin="5,0,5,0" Padding="10,5" IsEnabled="{Binding StockHasNextPage}">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="pagination.next"/>
+                                </Button.Content>
+                            </Button>
+                            <Button Command="{Binding StockLastPageCommand}" 
+                                    Padding="10,5" IsEnabled="{Binding StockHasNextPage}">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="pagination.last"/>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <!-- Low Stock Report Tab -->
+            <TabItem>
+                <TabItem.Header>
+                    <translation:TranslationExtension Key="reports.lowStock"/>
+                </TabItem.Header>
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                        <Button Command="{Binding GenerateLowStockReportCommand}" Margin="0,0,10,0" Padding="10,5">
+                            <Button.Content>
+                                <translation:TranslationExtension Key="reports.generate"/>
+                            </Button.Content>
+                        </Button>
+                        <Button Command="{Binding ExportLowStockReportCommand}" Padding="10,5">
+                            <Button.Content>
+                                <translation:TranslationExtension Key="reports.export"/>
+                            </Button.Content>
+                        </Button>
+                    </StackPanel>
+
+                    <DataGrid Grid.Row="1" 
+                             ItemsSource="{Binding LowStockReport}" 
+                             AutoGenerateColumns="False"
+                             IsReadOnly="True"
+                             GridLinesVisibility="All"
+                             HeadersVisibility="Column">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding SKU}" Width="100">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="products.sku"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding Name}" Width="*">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="products.name"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding CategoryName}" Width="120">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="products.category"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding Quantity}" Width="80">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="products.quantity"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding MinimumStockLevel}" Width="80">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="products.minStockLevel"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding Price, StringFormat=C}" Width="100">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="products.price"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    
+                    <!-- Pagination Controls -->
+                    <Grid Grid.Row="2" Margin="0,10,0,0">
+                        <Grid.Visibility>
+                            <MultiBinding Converter="{StaticResource CountToVisibilityConverter}">
+                                <Binding Path="LowStockTotalCount"/>
+                                <Binding Path="LowStockPageSize"/>
+                            </MultiBinding>
+                        </Grid.Visibility>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding LowStockPaginationInfo}" Margin="0,0,15,0" VerticalAlignment="Center"/>
+                            <TextBlock VerticalAlignment="Center" Margin="0,0,5,0">
+                                <TextBlock.Inlines>
+                                    <Run>
+                                        <Run.Text>
+                                            <translation:TranslationExtension Key="pagination.pageSize"/>
+                                        </Run.Text>
+                                    </Run>
+                                    <Run Text=":"/>
+                                </TextBlock.Inlines>
+                            </TextBlock>
+                            <ComboBox SelectedValue="{Binding LowStockPageSize, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Tag" Width="100" VerticalContentAlignment="Center">
+                                <ComboBox.Items>
+                                    <ComboBoxItem Content="10" Tag="10"/>
+                                    <ComboBoxItem Content="25" Tag="25"/>
+                                    <ComboBoxItem Content="50" Tag="50"/>
+                                    <ComboBoxItem Content="100" Tag="100"/>
+                                </ComboBox.Items>
+                            </ComboBox>
+                            <Button Command="{Binding LowStockChangePageSizeCommand}" 
+                                    Margin="5,0,0,0" Padding="10,5">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="pagination.apply"/>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+                        
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Button Command="{Binding LowStockFirstPageCommand}" 
+                                    Margin="0,0,5,0" Padding="10,5" IsEnabled="{Binding LowStockHasPreviousPage}">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="pagination.first"/>
+                                </Button.Content>
+                            </Button>
+                            <Button Command="{Binding LowStockPreviousPageCommand}" 
+                                    Margin="0,0,5,0" Padding="10,5" IsEnabled="{Binding LowStockHasPreviousPage}">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="pagination.previous"/>
+                                </Button.Content>
+                            </Button>
+                            <TextBlock VerticalAlignment="Center" Margin="5,0">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} / {1}">
+                                        <Binding Path="LowStockCurrentPage"/>
+                                        <Binding Path="LowStockTotalPages"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                            <Button Command="{Binding LowStockNextPageCommand}" 
+                                    Margin="5,0,5,0" Padding="10,5" IsEnabled="{Binding LowStockHasNextPage}">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="pagination.next"/>
+                                </Button.Content>
+                            </Button>
+                            <Button Command="{Binding LowStockLastPageCommand}" 
+                                    Padding="10,5" IsEnabled="{Binding LowStockHasNextPage}">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="pagination.last"/>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <!-- Movement History Report Tab -->
+            <TabItem>
+                <TabItem.Header>
+                    <translation:TranslationExtension Key="reports.movementHistory"/>
+                </TabItem.Header>
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBlock VerticalAlignment="Center" Margin="0,0,5,0">
+                            <TextBlock.Inlines>
+                                <Run>
+                                    <Run.Text>
+                                        <translation:TranslationExtension Key="reports.startDate"/>
+                                    </Run.Text>
+                                </Run>
+                                <Run Text=":"/>
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                        <DatePicker SelectedDate="{Binding StartDate}" Width="150" Margin="0,0,20,0"/>
+                        <TextBlock VerticalAlignment="Center" Margin="0,0,5,0">
+                            <TextBlock.Inlines>
+                                <Run>
+                                    <Run.Text>
+                                        <translation:TranslationExtension Key="reports.endDate"/>
+                                    </Run.Text>
+                                </Run>
+                                <Run Text=":"/>
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                        <DatePicker SelectedDate="{Binding EndDate}" Width="150" Margin="0,0,20,0"/>
+                        <Button Command="{Binding GenerateMovementReportCommand}" Margin="0,0,10,0" Padding="10,5">
+                            <Button.Content>
+                                <translation:TranslationExtension Key="reports.generate"/>
+                            </Button.Content>
+                        </Button>
+                        <Button Command="{Binding ExportMovementReportCommand}" Padding="10,5">
+                            <Button.Content>
+                                <translation:TranslationExtension Key="reports.export"/>
+                            </Button.Content>
+                        </Button>
+                    </StackPanel>
+
+                    <DataGrid Grid.Row="2" 
+                             ItemsSource="{Binding MovementReport}" 
+                             AutoGenerateColumns="False"
+                             IsReadOnly="True"
+                             GridLinesVisibility="All"
+                             HeadersVisibility="Column">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Width="150">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="stockMovements.date"/>
+                                </DataGridTextColumn.Header>
+                                <DataGridTextColumn.Binding>
+                                      <Binding Path="CreatedAt" Converter="{StaticResource UtcToLocalDateConverter}"/>
+                                </DataGridTextColumn.Binding>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding ProductName}" Width="*">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="stockMovements.product"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding MovementType}" Width="100">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="stockMovements.type"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding Quantity}" Width="80">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="stockMovements.quantity"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding CreatedBy}" Width="120">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="stockMovements.createdBy"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding Reason}" Width="150">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="stockMovements.reason"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding Notes}" Width="*">
+                                <DataGridTextColumn.Header>
+                                    <translation:TranslationExtension Key="stockMovements.notes"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>
+

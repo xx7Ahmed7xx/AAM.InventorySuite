@@ -1,0 +1,135 @@
+<div class="products-container">
+  <div class="header">
+    <h1>{{ translate.translate('products.title') }}</h1>
+    <div class="actions">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        [placeholder]="translate.translate('products.search') + '...'"
+        (keyup.enter)="search()"
+        class="search-input">
+      <button (click)="search()" class="btn btn-secondary">{{ translate.translate('common.search') }}</button>
+      <button (click)="showLowStock()" class="btn btn-warning">{{ translate.translate('products.lowStock') }}</button>
+      <button (click)="loadProducts()" class="btn btn-secondary">{{ translate.translate('common.refresh') }}</button>
+      <button (click)="addProduct()" class="btn btn-primary" *ngIf="authService.isModerator()">{{ translate.translate('products.add') }}</button>
+    </div>
+  </div>
+
+  <div *ngIf="showProductForm" class="product-form">
+    <h2>{{ isEditing ? translate.translate('products.edit') : translate.translate('products.add') }}</h2>
+    <form (ngSubmit)="saveProduct()">
+      <div class="form-group">
+        <label>{{ translate.translate('products.sku') }} *</label>
+        <input type="text" [(ngModel)]="productForm.sku" name="sku" required>
+      </div>
+      <div class="form-group">
+        <label>{{ translate.translate('products.name') }} *</label>
+        <input type="text" [(ngModel)]="productForm.name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label>{{ translate.translate('products.description') }}</label>
+        <textarea [(ngModel)]="productForm.description" name="description"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{ translate.translate('products.price') }} *</label>
+          <input type="number" [(ngModel)]="productForm.price" name="price" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label>{{ translate.translate('products.cost') }} *</label>
+          <input type="number" [(ngModel)]="productForm.cost" name="cost" step="0.01" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group" *ngIf="!isEditing">
+          <label>{{ translate.translate('products.initialQuantity') }}</label>
+          <input type="number" [(ngModel)]="productForm.initialQuantity" name="initialQuantity">
+        </div>
+        <div class="form-group">
+          <label>{{ translate.translate('products.minStockLevel') }}</label>
+          <input type="number" [(ngModel)]="productForm.minimumStockLevel" name="minimumStockLevel">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>{{ translate.translate('products.barcode') }}</label>
+        <input type="text" [(ngModel)]="productForm.barcode" name="barcode">
+      </div>
+      <div class="form-group">
+        <label>{{ translate.translate('products.category') }}</label>
+        <select [(ngModel)]="productForm.categoryId" name="categoryId">
+          <option [ngValue]="null">{{ translate.translate('products.none') }}</option>
+          <option *ngFor="let cat of categories" [ngValue]="cat.id">{{ cat.name }}</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ translate.translate('common.save') }}</button>
+        <button type="button" (click)="cancelForm()" class="btn btn-secondary">{{ translate.translate('common.cancel') }}</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="products-table">
+    <table>
+      <thead>
+        <tr>
+          <th>{{ translate.translate('products.sku') }}</th>
+          <th>{{ translate.translate('products.name') }}</th>
+          <th>{{ translate.translate('products.category') }}</th>
+          <th>{{ translate.translate('products.quantity') }}</th>
+          <th>{{ translate.translate('products.price') }}</th>
+          <th>{{ translate.translate('products.lowStock') }}</th>
+          <th>{{ translate.translate('products.actions') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of products" [class.low-stock]="product.isLowStock">
+          <td>{{ product.sku }}</td>
+          <td>{{ product.name }}</td>
+          <td>{{ product.categoryName || '-' }}</td>
+          <td>{{ product.quantity }}</td>
+          <td>{{ product.price | currency }}</td>
+          <td>
+            <span *ngIf="product.isLowStock" class="badge badge-warning">{{ translate.translate('common.yes') }}</span>
+            <span *ngIf="!product.isLowStock">{{ translate.translate('common.no') }}</span>
+          </td>
+          <td>
+            <button (click)="editProduct(product)" class="btn btn-sm btn-secondary" *ngIf="authService.isModerator()">{{ translate.translate('common.edit') }}</button>
+            <button (click)="deleteProduct(product)" class="btn btn-sm btn-danger" *ngIf="authService.isModerator()">{{ translate.translate('common.delete') }}</button>
+          </td>
+        </tr>
+        <tr *ngIf="products.length === 0">
+          <td colspan="7" class="text-center">{{ translate.translate('products.noProducts') }}</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <!-- Pagination Controls -->
+    <div class="pagination" *ngIf="totalCount > 0">
+      <div class="pagination-info">
+        <span>{{ translate.translate('pagination.showing') }} {{ (currentPage - 1) * pageSize + 1 }} {{ translate.translate('pagination.to') }} {{ Math.min(currentPage * pageSize, totalCount) }} {{ translate.translate('pagination.of') }} {{ totalCount }} products</span>
+        <select [(ngModel)]="pageSize" (change)="changePageSize(pageSize)" class="page-size-select">
+          <option [value]="10">10 {{ translate.translate('pagination.perPage') }}</option>
+          <option [value]="25">25 {{ translate.translate('pagination.perPage') }}</option>
+          <option [value]="50">50 {{ translate.translate('pagination.perPage') }}</option>
+          <option [value]="100">100 {{ translate.translate('pagination.perPage') }}</option>
+        </select>
+      </div>
+      <div class="pagination-buttons">
+        <button (click)="goToPage(1)" [disabled]="!hasPreviousPage" class="btn btn-sm">{{ translate.translate('pagination.first') }}</button>
+        <button (click)="goToPage(currentPage - 1)" [disabled]="!hasPreviousPage" class="btn btn-sm">{{ translate.translate('pagination.previous') }}</button>
+        <span class="page-numbers">
+          <button 
+            *ngFor="let page of getPageNumbers()" 
+            (click)="goToPage(page)"
+            [class.active]="page === currentPage"
+            class="btn btn-sm">
+            {{ page }}
+          </button>
+        </span>
+        <button (click)="goToPage(currentPage + 1)" [disabled]="!hasNextPage" class="btn btn-sm">{{ translate.translate('pagination.next') }}</button>
+        <button (click)="goToPage(totalPages)" [disabled]="!hasNextPage" class="btn btn-sm">{{ translate.translate('pagination.last') }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+

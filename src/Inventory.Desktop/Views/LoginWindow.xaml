@@ -1,0 +1,92 @@
+<Window x:Class="Inventory.Desktop.Views.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:translation="clr-namespace:Inventory.Desktop.Converters"
+        Height="430" Width="400"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0"
+                       FontSize="24" FontWeight="Bold" 
+                       HorizontalAlignment="Center">
+                <TextBlock.Text>
+                    <translation:TranslationExtension Key="login.appTitle"/>
+                </TextBlock.Text>
+            </TextBlock>
+            <ComboBox Grid.Column="1" x:Name="LanguageComboBox" Width="80" SelectionChanged="LanguageComboBox_SelectionChanged" VerticalContentAlignment="Center">
+                <ComboBoxItem Content="EN" Tag="en-US" IsSelected="True"/>
+                <ComboBoxItem Content="AR" Tag="ar-SA"/>
+            </ComboBox>
+        </Grid>
+
+        <TextBlock Grid.Row="1" 
+                   FontSize="18" 
+                   HorizontalAlignment="Center" 
+                   Margin="0,0,0,30">
+            <TextBlock.Text>
+                <translation:TranslationExtension Key="login.title"/>
+            </TextBlock.Text>
+        </TextBlock>
+
+        <TextBlock Grid.Row="2" Margin="0,0,0,5">
+            <TextBlock.Text>
+                <translation:TranslationExtension Key="users.username"/>
+            </TextBlock.Text>
+        </TextBlock>
+        <TextBox Grid.Row="3" x:Name="UsernameTextBox" Margin="0,0,0,15"/>
+
+        <TextBlock Grid.Row="4" Margin="0,0,0,5">
+            <TextBlock.Text>
+                <translation:TranslationExtension Key="users.password"/>
+            </TextBlock.Text>
+        </TextBlock>
+        <PasswordBox Grid.Row="5" x:Name="PasswordBox" Margin="0,0,0,15"/>
+
+        <TextBlock Grid.Row="6" x:Name="ErrorTextBlock" 
+                   Foreground="Red" 
+                   TextWrapping="Wrap"
+                   Visibility="Collapsed"
+                   Margin="0,0,0,10"/>
+
+        <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Click="Login_Click" Width="100" Margin="0,0,10,0" IsDefault="True">
+                <Button.Content>
+                    <translation:TranslationExtension Key="login.title"/>
+                </Button.Content>
+            </Button>
+            <Button Click="Cancel_Click" Width="100" IsCancel="True">
+                <Button.Content>
+                    <translation:TranslationExtension Key="common.cancel"/>
+                </Button.Content>
+            </Button>
+        </StackPanel>
+
+        <TextBlock Grid.Row="8" 
+                   FontSize="10" 
+                   Foreground="Gray"
+                   HorizontalAlignment="Center"
+                   Margin="0,20,0,0">
+            <TextBlock.Text>
+                <translation:TranslationExtension Key="login.defaultCredentials"/>
+            </TextBlock.Text>
+        </TextBlock>
+    </Grid>
+</Window>
+

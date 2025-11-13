@@ -1,0 +1,173 @@
+<Window x:Class="Inventory.Desktop.Views.ProductDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:translation="clr-namespace:Inventory.Desktop.Converters"
+        Height="590" Width="500"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0">
+            <Label Margin="0,5">
+                <Label.Content>
+                    <TextBlock>
+                        <TextBlock.Inlines>
+                            <Run>
+                                <Run.Text>
+                                    <translation:TranslationExtension Key="products.sku"/>
+                                </Run.Text>
+                            </Run>
+                            <Run Text=" *"/>
+                        </TextBlock.Inlines>
+                    </TextBlock>
+                </Label.Content>
+            </Label>
+            <TextBox x:Name="SkuTextBox" Margin="0,0,0,10"/>
+
+            <Label Margin="0,5">
+                <Label.Content>
+                    <TextBlock>
+                        <TextBlock.Inlines>
+                            <Run>
+                                <Run.Text>
+                                    <translation:TranslationExtension Key="products.name"/>
+                                </Run.Text>
+                            </Run>
+                            <Run Text=" *"/>
+                        </TextBlock.Inlines>
+                    </TextBlock>
+                </Label.Content>
+            </Label>
+            <TextBox x:Name="NameTextBox" Margin="0,0,0,10"/>
+
+            <Label Margin="0,5">
+                <Label.Content>
+                    <translation:TranslationExtension Key="products.description"/>
+                </Label.Content>
+            </Label>
+            <TextBox x:Name="DescriptionTextBox" Margin="0,0,0,10" 
+                     TextWrapping="Wrap" AcceptsReturn="True" Height="60"/>
+
+            <Label Margin="0,5">
+                <Label.Content>
+                    <translation:TranslationExtension Key="products.barcode"/>
+                </Label.Content>
+            </Label>
+            <TextBox x:Name="BarcodeTextBox" Margin="0,0,0,10"/>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                    <Label Margin="0,5">
+                        <Label.Content>
+                            <TextBlock>
+                                <TextBlock.Inlines>
+                                    <Run>
+                                        <Run.Text>
+                                            <translation:TranslationExtension Key="products.price"/>
+                                        </Run.Text>
+                                    </Run>
+                                    <Run Text=" *"/>
+                                </TextBlock.Inlines>
+                            </TextBlock>
+                        </Label.Content>
+                    </Label>
+                    <TextBox x:Name="PriceTextBox" Margin="0,0,0,10"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                    <Label Margin="0,5">
+                        <Label.Content>
+                            <TextBlock>
+                                <TextBlock.Inlines>
+                                    <Run>
+                                        <Run.Text>
+                                            <translation:TranslationExtension Key="products.cost"/>
+                                        </Run.Text>
+                                    </Run>
+                                    <Run Text=" *"/>
+                                </TextBlock.Inlines>
+                            </TextBlock>
+                        </Label.Content>
+                    </Label>
+                    <TextBox x:Name="CostTextBox" Margin="0,0,0,10"/>
+                </StackPanel>
+            </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,5,0" x:Name="QuantityPanel">
+                    <Label Margin="0,5">
+                        <Label.Content>
+                            <TextBlock>
+                                <TextBlock.Inlines>
+                                    <Run>
+                                        <Run.Text>
+                                            <translation:TranslationExtension Key="products.initialQuantity"/>
+                                        </Run.Text>
+                                    </Run>
+                                    <Run Text=" *"/>
+                                </TextBlock.Inlines>
+                            </TextBlock>
+                        </Label.Content>
+                    </Label>
+                    <TextBox x:Name="QuantityTextBox" Margin="0,0,0,10"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                    <Label Margin="0,5">
+                        <Label.Content>
+                            <TextBlock>
+                                <TextBlock.Inlines>
+                                    <Run>
+                                        <Run.Text>
+                                            <translation:TranslationExtension Key="products.minStockLevel"/>
+                                        </Run.Text>
+                                    </Run>
+                                    <Run Text=" *"/>
+                                </TextBlock.Inlines>
+                            </TextBlock>
+                        </Label.Content>
+                    </Label>
+                    <TextBox x:Name="MinStockTextBox" Margin="0,0,0,10"/>
+                </StackPanel>
+            </Grid>
+
+            <Label Margin="0,5">
+                <Label.Content>
+                    <translation:TranslationExtension Key="products.category"/>
+                </Label.Content>
+            </Label>
+            <ComboBox x:Name="CategoryComboBox" Margin="0,0,0,10" 
+                      SelectedValuePath="Id"
+                      DisplayMemberPath="DisplayName">
+            </ComboBox>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Click="Save_Click" Width="80" Margin="0,0,10,0" IsDefault="True">
+                <Button.Content>
+                    <translation:TranslationExtension Key="common.save"/>
+                </Button.Content>
+            </Button>
+            <Button Click="Cancel_Click" Width="80" IsCancel="True">
+                <Button.Content>
+                    <translation:TranslationExtension Key="common.cancel"/>
+                </Button.Content>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>
+

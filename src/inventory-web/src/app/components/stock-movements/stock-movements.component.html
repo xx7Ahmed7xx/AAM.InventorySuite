@@ -1,0 +1,118 @@
+<div class="stock-movements-container">
+  <div class="header">
+    <h1>{{ translate.translate('stockMovements.title') }}</h1>
+    <button (click)="loadMovements()" class="btn btn-secondary">{{ translate.translate('common.refresh') }}</button>
+  </div>
+
+  <div class="content-grid">
+    <!-- Movement Form -->
+    <div class="movement-form">
+      <h2>{{ translate.translate('stockMovements.execute') }}</h2>
+      <form (ngSubmit)="executeMovement()">
+        <div class="form-group">
+          <label>{{ translate.translate('stockMovements.product') }} *</label>
+          <select [(ngModel)]="selectedProduct" name="product" required>
+            <option [ngValue]="null">{{ translate.translate('stockMovements.selectProduct') }}</option>
+            <option *ngFor="let product of products" [ngValue]="product">
+              {{ product.name }} ({{ product.sku }}) - Qty: {{ product.quantity }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>{{ translate.translate('stockMovements.type') }} *</label>
+          <select [(ngModel)]="movementType" name="movementType" required>
+            <option [ngValue]="1">{{ translate.translate('stockMovements.add') }}</option>
+            <option [ngValue]="2">{{ translate.translate('stockMovements.remove') }}</option>
+            <option [ngValue]="3">{{ translate.translate('stockMovements.adjustment') }}</option>
+          </select>
+          <small style="color: #666; font-size: 0.9em; display: block; margin-top: 5px;">
+            {{ translate.translate('stockMovements.movementTypes') }}
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>{{ translate.translate('stockMovements.quantity') }} *</label>
+          <input type="number" [(ngModel)]="quantity" name="quantity" min="1" required>
+        </div>
+
+        <div class="form-group">
+          <label>{{ translate.translate('stockMovements.reason') }}</label>
+          <input type="text" [(ngModel)]="reason" name="reason">
+        </div>
+
+        <div class="form-group">
+          <label>{{ translate.translate('stockMovements.notes') }}</label>
+          <textarea [(ngModel)]="notes" name="notes" rows="3"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">{{ translate.translate('stockMovements.execute') }}</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Movement History -->
+    <div class="movement-history">
+      <h2>{{ translate.translate('stockMovements.history') }}</h2>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>{{ translate.translate('stockMovements.date') }}</th>
+              <th>{{ translate.translate('stockMovements.product') }}</th>
+              <th>{{ translate.translate('stockMovements.type') }}</th>
+              <th>{{ translate.translate('stockMovements.quantity') }}</th>
+              <th>{{ translate.translate('stockMovements.createdBy') }}</th>
+              <th>{{ translate.translate('stockMovements.reason') }}</th>
+              <th>{{ translate.translate('stockMovements.notes') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let movement of movements">
+              <td>{{ movement.createdAt | localDate:'short' }}</td>
+              <td>{{ movement.productName }}</td>
+              <td>{{ getMovementTypeName(movement.movementType) }}</td>
+              <td>{{ movement.quantity }}</td>
+              <td>{{ movement.createdBy || '-' }}</td>
+              <td>{{ movement.reason || '-' }}</td>
+              <td>{{ movement.notes || '-' }}</td>
+            </tr>
+            <tr *ngIf="movements.length === 0">
+              <td colspan="7" class="text-center">{{ translate.translate('stockMovements.noMovements') }}</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <!-- Pagination Controls -->
+        <div class="pagination" *ngIf="totalCount > 0">
+          <div class="pagination-info">
+            <span>{{ translate.translate('pagination.showing') }} {{ (currentPage - 1) * pageSize + 1 }} {{ translate.translate('pagination.to') }} {{ Math.min(currentPage * pageSize, totalCount) }} {{ translate.translate('pagination.of') }} {{ totalCount }} {{ translate.translate('nav.stockMovements') }}</span>
+            <select [(ngModel)]="pageSize" (change)="changePageSize(pageSize)" class="page-size-select">
+              <option [value]="10">10 {{ translate.translate('pagination.perPage') }}</option>
+              <option [value]="25">25 {{ translate.translate('pagination.perPage') }}</option>
+              <option [value]="50">50 {{ translate.translate('pagination.perPage') }}</option>
+              <option [value]="100">100 {{ translate.translate('pagination.perPage') }}</option>
+            </select>
+          </div>
+          <div class="pagination-buttons">
+            <button (click)="goToPage(1)" [disabled]="!hasPreviousPage" class="btn btn-sm">{{ translate.translate('pagination.first') }}</button>
+            <button (click)="goToPage(currentPage - 1)" [disabled]="!hasPreviousPage" class="btn btn-sm">{{ translate.translate('pagination.previous') }}</button>
+            <span class="page-numbers">
+              <button 
+                *ngFor="let page of getPageNumbers()" 
+                (click)="goToPage(page)"
+                [class.active]="page === currentPage"
+                class="btn btn-sm">
+                {{ page }}
+              </button>
+            </span>
+            <button (click)="goToPage(currentPage + 1)" [disabled]="!hasNextPage" class="btn btn-sm">{{ translate.translate('pagination.next') }}</button>
+            <button (click)="goToPage(totalPages)" [disabled]="!hasNextPage" class="btn btn-sm">{{ translate.translate('pagination.last') }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,55 @@
+<div class="categories-container">
+  <div class="header">
+    <h1>{{ translate.translate('categories.title') }}</h1>
+    <div class="actions">
+      <button (click)="loadCategories()" class="btn btn-secondary">{{ translate.translate('common.refresh') }}</button>
+      <button (click)="addCategory()" class="btn btn-primary" *ngIf="authService.isModerator()">{{ translate.translate('categories.add') }}</button>
+    </div>
+  </div>
+
+  <div *ngIf="showCategoryForm" class="category-form">
+    <h2>{{ isEditing ? translate.translate('categories.edit') : translate.translate('categories.add') }}</h2>
+    <form (ngSubmit)="saveCategory()">
+      <div class="form-group">
+        <label>{{ translate.translate('categories.name') }} *</label>
+        <input type="text" [(ngModel)]="categoryForm.name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label>{{ translate.translate('categories.description') }}</label>
+        <textarea [(ngModel)]="categoryForm.description" name="description"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ translate.translate('common.save') }}</button>
+        <button type="button" (click)="cancelForm()" class="btn btn-secondary">{{ translate.translate('common.cancel') }}</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="categories-table">
+    <table>
+      <thead>
+        <tr>
+          <th>{{ translate.translate('categories.name') }}</th>
+          <th>{{ translate.translate('categories.description') }}</th>
+          <th>{{ translate.translate('categories.productCount') }}</th>
+          <th>{{ translate.translate('categories.actions') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let category of categories">
+          <td>{{ category.name }}</td>
+          <td>{{ category.description || '-' }}</td>
+          <td>{{ category.productCount }}</td>
+          <td>
+            <button (click)="editCategory(category)" class="btn btn-sm btn-secondary" *ngIf="authService.isModerator()">{{ translate.translate('common.edit') }}</button>
+            <button (click)="deleteCategory(category)" class="btn btn-sm btn-danger" *ngIf="authService.isModerator()">{{ translate.translate('common.delete') }}</button>
+          </td>
+        </tr>
+        <tr *ngIf="categories.length === 0">
+          <td colspan="4" class="text-center">{{ translate.translate('categories.noCategories') }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+

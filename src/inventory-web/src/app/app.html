@@ -1,0 +1,22 @@
+<div class="app-container">
+  <nav class="navbar" *ngIf="authService.isAuthenticated()">
+    <h1>Inventory Suite</h1>
+    <div class="nav-links">
+      <a routerLink="/products" routerLinkActive="active">{{ translate.translate('nav.products') }}</a>
+      <a routerLink="/categories" routerLinkActive="active">{{ translate.translate('nav.categories') }}</a>
+      <a routerLink="/stock-movements" routerLinkActive="active">{{ translate.translate('nav.stockMovements') }}</a>
+      <a routerLink="/reports" routerLinkActive="active" *ngIf="authService.isModerator()">{{ translate.translate('nav.reports') }}</a>
+      <a routerLink="/users" routerLinkActive="active" *ngIf="authService.isSuperAdmin()">{{ translate.translate('nav.users') }}</a>
+      <span class="user-info">{{ authService.getCurrentUser()?.username }} ({{ authService.getCurrentUser()?.role }})</span>
+      <select [(ngModel)]="currentLocale" (change)="changeLanguage()" class="language-selector">
+        <option value="en">EN</option>
+        <option value="ar">AR</option>
+      </select>
+      <button (click)="logout()" class="btn-logout">{{ translate.translate('nav.logout') }}</button>
+    </div>
+  </nav>
+  
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

@@ -1,0 +1,573 @@
+<Window x:Class="Inventory.Desktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Inventory.Desktop"
+        xmlns:views="clr-namespace:Inventory.Desktop.Views"
+        xmlns:converters="clr-namespace:Inventory.Desktop.Converters"
+        xmlns:translation="clr-namespace:Inventory.Desktop.Converters"
+        mc:Ignorable="d"
+        Title="Inventory Suite" Height="700" Width="1220"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <converters:IntToVisibilityConverter x:Key="IntToVisibilityConverter"/>
+        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
+        <converters:UtcToLocalDateConverter x:Key="UtcToLocalDateConverter"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header Bar with User Info -->
+        <Border Grid.Row="0" Background="#343a40" Padding="10,5">
+    <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Inventory Suite" Foreground="White" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock x:Name="UserInfoTextBlock" Foreground="White" Margin="0,0,15,0" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="LanguageComboBox" Width="80" Margin="0,0,15,0" SelectionChanged="LanguageComboBox_SelectionChanged" VerticalContentAlignment="Center">
+                        <ComboBoxItem Content="EN" Tag="en-US" IsSelected="True"/>
+                        <ComboBoxItem Content="AR" Tag="ar-SA"/>
+                    </ComboBox>
+                    <Button Click="Logout_Click" Padding="10,5" Background="#dc3545" Foreground="White" BorderThickness="0">
+                        <Button.Content>
+                            <translation:TranslationExtension Key="nav.logout"/>
+                        </Button.Content>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Menu Bar -->
+        <Menu Grid.Row="1">
+            <MenuItem>
+                <MenuItem.Header>
+                    <translation:TranslationExtension Key="menu.file"/>
+                </MenuItem.Header>
+                <MenuItem Click="Exit_Click">
+                    <MenuItem.Header>
+                        <translation:TranslationExtension Key="menu.exit"/>
+                    </MenuItem.Header>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem>
+                <MenuItem.Header>
+                    <translation:TranslationExtension Key="menu.view"/>
+                </MenuItem.Header>
+                <MenuItem Click="ProductsTab_Click">
+                    <MenuItem.Header>
+                        <translation:TranslationExtension Key="nav.products"/>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem Click="CategoriesTab_Click">
+                    <MenuItem.Header>
+                        <translation:TranslationExtension Key="nav.categories"/>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem Click="StockMovementsTab_Click">
+                    <MenuItem.Header>
+                        <translation:TranslationExtension Key="nav.stockMovements"/>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem Click="ReportsTab_Click" x:Name="ReportsMenuItem">
+                    <MenuItem.Header>
+                        <translation:TranslationExtension Key="nav.reports"/>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem Click="UsersTab_Click" x:Name="UsersMenuItem">
+                    <MenuItem.Header>
+                        <translation:TranslationExtension Key="nav.users"/>
+                    </MenuItem.Header>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+
+        <!-- Main Content with Tabs -->
+        <TabControl Grid.Row="2" x:Name="MainTabControl" Margin="10">
+            <TabItem x:Name="ProductsTab">
+                <TabItem.Header>
+                    <translation:TranslationExtension Key="nav.products"/>
+                </TabItem.Header>
+                <GroupBox>
+                    <GroupBox.Header>
+                        <translation:TranslationExtension Key="products.title"/>
+                    </GroupBox.Header>
+                    <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Search and Actions -->
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBox Text="{Binding ProductViewModel.SearchTerm, UpdateSourceTrigger=PropertyChanged}" 
+                                     Width="200" Margin="0,0,10,0" 
+                                     VerticalContentAlignment="Center"/>
+                            <Button Command="{Binding ProductViewModel.SearchCommand}" 
+                                    Margin="0,0,10,0" Padding="10,5">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="products.search"/>
+                                </Button.Content>
+                            </Button>
+                            <Button Command="{Binding ProductViewModel.AddProductCommand}" 
+                                    Margin="0,0,10,0" Padding="10,5"
+                                    Visibility="{Binding ProductViewModel.IsModerator, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="products.add"/>
+                                </Button.Content>
+                            </Button>
+                            <Button Command="{Binding ProductViewModel.EditProductCommand}" 
+                                    Margin="0,0,10,0" Padding="10,5"
+                                    Visibility="{Binding ProductViewModel.IsModerator, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="common.edit"/>
+                                </Button.Content>
+                            </Button>
+                            <Button Command="{Binding ProductViewModel.DeleteProductCommand}" 
+                                    Padding="10,5" Background="#FFD32F2F" Foreground="White"
+                                    Visibility="{Binding ProductViewModel.IsModerator, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="common.delete"/>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+
+                        <!-- Products List -->
+                        <DataGrid Grid.Row="1" 
+                                  ItemsSource="{Binding ProductViewModel.Products}" 
+                                  SelectedItem="{Binding ProductViewModel.SelectedProduct}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  GridLinesVisibility="All"
+                                  HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding SKU}" Width="100">
+                                    <DataGridTextColumn.Header>
+                                        <translation:TranslationExtension Key="products.sku"/>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Name}" Width="*">
+                                    <DataGridTextColumn.Header>
+                                        <translation:TranslationExtension Key="products.name"/>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding CategoryName}" Width="120">
+                                    <DataGridTextColumn.Header>
+                                        <translation:TranslationExtension Key="products.category"/>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Quantity}" Width="80">
+                                    <DataGridTextColumn.Header>
+                                        <translation:TranslationExtension Key="products.quantity"/>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Price, StringFormat=C}" Width="100">
+                                    <DataGridTextColumn.Header>
+                                        <translation:TranslationExtension Key="products.price"/>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding IsLowStock}" Width="85">
+                                    <DataGridTextColumn.Header>
+                                        <translation:TranslationExtension Key="products.lowStock"/>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Pagination Controls -->
+                        <Grid Grid.Row="2" Margin="0,10,0,0">
+                            <Grid.Visibility>
+                                <MultiBinding Converter="{StaticResource CountToVisibilityConverter}">
+                                    <Binding Path="ProductViewModel.TotalCount"/>
+                                    <Binding Path="ProductViewModel.PageSize"/>
+                                </MultiBinding>
+                            </Grid.Visibility>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding ProductViewModel.PaginationInfo}" Margin="0,0,15,0" VerticalAlignment="Center"/>
+                                <TextBlock VerticalAlignment="Center" Margin="0,0,5,0">
+                                    <TextBlock.Inlines>
+                                        <Run>
+                                            <Run.Text>
+                                                <translation:TranslationExtension Key="pagination.pageSize"/>
+                                            </Run.Text>
+                                        </Run>
+                                        <Run Text=":"/>
+                                    </TextBlock.Inlines>
+                                </TextBlock>
+                                <ComboBox SelectedValue="{Binding ProductViewModel.PageSize, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Tag" Width="100" VerticalContentAlignment="Center">
+                                    <ComboBox.Items>
+                                        <ComboBoxItem Content="10" Tag="10"/>
+                                        <ComboBoxItem Content="25" Tag="25"/>
+                                        <ComboBoxItem Content="50" Tag="50"/>
+                                        <ComboBoxItem Content="100" Tag="100"/>
+                                    </ComboBox.Items>
+                                </ComboBox>
+                                <Button Command="{Binding ProductViewModel.ChangePageSizeCommand}" 
+                                        Margin="5,0,0,0" Padding="10,5">
+                                    <Button.Content>
+                                        <translation:TranslationExtension Key="pagination.apply"/>
+                                    </Button.Content>
+                                </Button>
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <Button Command="{Binding ProductViewModel.FirstPageCommand}" 
+                                        Margin="0,0,5,0" Padding="10,5" IsEnabled="{Binding ProductViewModel.HasPreviousPage}">
+                                    <Button.Content>
+                                        <translation:TranslationExtension Key="pagination.first"/>
+                                    </Button.Content>
+                                </Button>
+                                <Button Command="{Binding ProductViewModel.PreviousPageCommand}" 
+                                        Margin="0,0,5,0" Padding="10,5" IsEnabled="{Binding ProductViewModel.HasPreviousPage}">
+                                    <Button.Content>
+                                        <translation:TranslationExtension Key="pagination.previous"/>
+                                    </Button.Content>
+                                </Button>
+                                <TextBlock VerticalAlignment="Center" Margin="5,0">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} / {1}">
+                                            <Binding Path="ProductViewModel.CurrentPage"/>
+                                            <Binding Path="ProductViewModel.TotalPages"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                                <Button Command="{Binding ProductViewModel.NextPageCommand}" 
+                                        Margin="5,0,5,0" Padding="10,5" IsEnabled="{Binding ProductViewModel.HasNextPage}">
+                                    <Button.Content>
+                                        <translation:TranslationExtension Key="pagination.next"/>
+                                    </Button.Content>
+                                </Button>
+                                <Button Command="{Binding ProductViewModel.LastPageCommand}" 
+                                        Padding="10,5" IsEnabled="{Binding ProductViewModel.HasNextPage}">
+                                    <Button.Content>
+                                        <translation:TranslationExtension Key="pagination.last"/>
+                                    </Button.Content>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                        
+                        <!-- Status Bar -->
+                        <TextBlock Grid.Row="4" 
+                                   Margin="0,5,0,0" 
+                                   VerticalAlignment="Center">
+                                    <TextBlock.Inlines>
+                                        <Run>
+                                            <Run.Text>
+                                                <translation:TranslationExtension Key="products.total"/>
+                                            </Run.Text>
+                                        </Run>
+                                        <Run Text=": "/>
+                                        <Run Text="{Binding ProductViewModel.TotalCount}"/>
+                                    </TextBlock.Inlines>
+                                </TextBlock>
+                    </Grid>
+                </GroupBox>
+            </TabItem>
+
+            <TabItem x:Name="CategoriesTab">
+                <TabItem.Header>
+                    <translation:TranslationExtension Key="nav.categories"/>
+                </TabItem.Header>
+                <GroupBox>
+                    <GroupBox.Header>
+                        <translation:TranslationExtension Key="categories.title"/>
+                    </GroupBox.Header>
+                    <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Actions -->
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,5">
+                            <Button Command="{Binding CategoryViewModel.AddCategoryCommand}" 
+                                    Margin="0,0,10,0" Padding="10,5"
+                                    Visibility="{Binding CategoryViewModel.IsModerator, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="categories.add"/>
+                                </Button.Content>
+                            </Button>
+                            <Button Command="{Binding CategoryViewModel.EditCategoryCommand}" 
+                                    Margin="0,0,10,0" Padding="10,5"
+                                    Visibility="{Binding CategoryViewModel.IsModerator, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="common.edit"/>
+                                </Button.Content>
+                            </Button>
+                            <Button Command="{Binding CategoryViewModel.DeleteCategoryCommand}" 
+                                    Padding="10,5" Background="#FFD32F2F" Foreground="White"
+                                    Visibility="{Binding CategoryViewModel.IsModerator, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="common.delete"/>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+
+                        <!-- Categories List -->
+                        <DataGrid Grid.Row="1" 
+                                  ItemsSource="{Binding CategoryViewModel.Categories}" 
+                                  SelectedItem="{Binding CategoryViewModel.SelectedCategory}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  GridLinesVisibility="All"
+                                  HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Name}" Width="*">
+                                    <DataGridTextColumn.Header>
+                                        <translation:TranslationExtension Key="categories.name"/>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Description}" Width="*">
+                                    <DataGridTextColumn.Header>
+                                        <translation:TranslationExtension Key="categories.description"/>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding ProductCount}" Width="120">
+                                    <DataGridTextColumn.Header>
+                                        <translation:TranslationExtension Key="categories.productCount"/>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Status Bar -->
+                        <TextBlock Grid.Row="2" 
+                                   Margin="0,5,0,0" 
+                                   VerticalAlignment="Center">
+                                    <TextBlock.Inlines>
+                                        <Run>
+                                            <Run.Text>
+                                                <translation:TranslationExtension Key="categories.total"/>
+                                            </Run.Text>
+                                        </Run>
+                                        <Run Text=": "/>
+                                        <Run>
+                                            <Run.Text>
+                                                <Binding Path="CategoryViewModel.Categories.Count" Mode="OneWay"/>
+                                            </Run.Text>
+                                        </Run>
+                                    </TextBlock.Inlines>
+                                </TextBlock>
+                    </Grid>
+                </GroupBox>
+            </TabItem>
+
+            <TabItem x:Name="StockMovementsTab">
+                <TabItem.Header>
+                    <translation:TranslationExtension Key="nav.stockMovements"/>
+                </TabItem.Header>
+                <views:StockMovementView DataContext="{Binding StockMovementViewModel}"/>
+            </TabItem>
+
+            <TabItem x:Name="ReportsTab">
+                <TabItem.Header>
+                    <translation:TranslationExtension Key="nav.reports"/>
+                </TabItem.Header>
+                <views:ReportsView DataContext="{Binding ReportsViewModel}"/>
+            </TabItem>
+
+            <TabItem x:Name="UsersTab">
+                <TabItem.Header>
+                    <translation:TranslationExtension Key="nav.users"/>
+                </TabItem.Header>
+                <GroupBox>
+                    <GroupBox.Header>
+                        <translation:TranslationExtension Key="users.title"/>
+                    </GroupBox.Header>
+                    <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Actions -->
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,5">
+                            <Button Command="{Binding UserViewModel.AddUserCommand}" 
+                                    Margin="0,0,10,0" Padding="10,5">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="users.add"/>
+                                </Button.Content>
+                            </Button>
+                            <Button Command="{Binding UserViewModel.EditUserCommand}" 
+                                    Margin="0,0,10,0" Padding="10,5">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="common.edit"/>
+                                </Button.Content>
+                            </Button>
+                            <Button Command="{Binding UserViewModel.DeleteUserCommand}" 
+                                    Padding="10,5" Background="#FFD32F2F" Foreground="White">
+                                <Button.Content>
+                                    <translation:TranslationExtension Key="common.delete"/>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+
+                        <!-- Users List -->
+                        <DataGrid Grid.Row="1" 
+                                  ItemsSource="{Binding UserViewModel.Users}" 
+                                  SelectedItem="{Binding UserViewModel.SelectedUser}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  GridLinesVisibility="All"
+                                  HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Username}" Width="*">
+                                    <DataGridTextColumn.Header>
+                                        <translation:TranslationExtension Key="users.username"/>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Email}" Width="*">
+                                    <DataGridTextColumn.Header>
+                                        <translation:TranslationExtension Key="users.email"/>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Role}" Width="120">
+                                    <DataGridTextColumn.Header>
+                                        <translation:TranslationExtension Key="users.role"/>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridCheckBoxColumn Binding="{Binding IsActive}" Width="80">
+                                    <DataGridCheckBoxColumn.Header>
+                                        <translation:TranslationExtension Key="users.active"/>
+                                    </DataGridCheckBoxColumn.Header>
+                                </DataGridCheckBoxColumn>
+                                <DataGridTextColumn Width="150">
+                                    <DataGridTextColumn.Header>
+                                        <translation:TranslationExtension Key="users.lastLogin"/>
+                                    </DataGridTextColumn.Header>
+                                    <DataGridTextColumn.Binding>
+                                        <Binding Path="LastLoginDate" Converter="{StaticResource UtcToLocalDateConverter}"/>
+                                    </DataGridTextColumn.Binding>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Pagination Controls -->
+                        <Grid Grid.Row="2" Margin="0,10,0,0">
+                            <Grid.Visibility>
+                                <MultiBinding Converter="{StaticResource CountToVisibilityConverter}">
+                                    <Binding Path="UserViewModel.TotalCount"/>
+                                    <Binding Path="UserViewModel.PageSize"/>
+                                </MultiBinding>
+                            </Grid.Visibility>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding UserViewModel.PaginationInfo}" Margin="0,0,15,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Page Size:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <ComboBox SelectedValue="{Binding UserViewModel.PageSize, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Tag" Width="100" VerticalContentAlignment="Center">
+                                    <ComboBox.Items>
+                                        <ComboBoxItem Content="10" Tag="10"/>
+                                        <ComboBoxItem Content="25" Tag="25"/>
+                                        <ComboBoxItem Content="50" Tag="50"/>
+                                        <ComboBoxItem Content="100" Tag="100"/>
+                                    </ComboBox.Items>
+                                </ComboBox>
+                                <Button Command="{Binding UserViewModel.ChangePageSizeCommand}" 
+                                        Margin="5,0,0,0" Padding="10,5">
+                                    <Button.Content>
+                                        <translation:TranslationExtension Key="pagination.apply"/>
+                                    </Button.Content>
+                                </Button>
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <Button Command="{Binding UserViewModel.FirstPageCommand}" 
+                                        Margin="0,0,5,0" Padding="10,5" IsEnabled="{Binding UserViewModel.HasPreviousPage}">
+                                    <Button.Content>
+                                        <translation:TranslationExtension Key="pagination.first"/>
+                                    </Button.Content>
+                                </Button>
+                                <Button Command="{Binding UserViewModel.PreviousPageCommand}" 
+                                        Margin="0,0,5,0" Padding="10,5" IsEnabled="{Binding UserViewModel.HasPreviousPage}">
+                                    <Button.Content>
+                                        <translation:TranslationExtension Key="pagination.previous"/>
+                                    </Button.Content>
+                                </Button>
+                                <TextBlock VerticalAlignment="Center" Margin="5,0">
+                                    <TextBlock.Inlines>
+                                        <Run>
+                                            <Run.Text>
+                                                <translation:TranslationExtension Key="pagination.page"/>
+                                            </Run.Text>
+                                        </Run>
+                                        <Run Text=" "/>
+                                        <Run>
+                                            <Run.Text>
+                                                <Binding Path="UserViewModel.CurrentPage" Mode="OneWay"/>
+                                            </Run.Text>
+                                        </Run>
+                                        <Run Text=" "/>
+                                        <Run>
+                                            <Run.Text>
+                                                <translation:TranslationExtension Key="pagination.of"/>
+                                            </Run.Text>
+                                        </Run>
+                                        <Run Text=" "/>
+                                        <Run>
+                                            <Run.Text>
+                                                <Binding Path="UserViewModel.TotalPages" Mode="OneWay"/>
+                                            </Run.Text>
+                                        </Run>
+                                    </TextBlock.Inlines>
+                                </TextBlock>
+                                <Button Command="{Binding UserViewModel.NextPageCommand}" 
+                                        Margin="5,0,5,0" Padding="10,5" IsEnabled="{Binding UserViewModel.HasNextPage}">
+                                    <Button.Content>
+                                        <translation:TranslationExtension Key="pagination.next"/>
+                                    </Button.Content>
+                                </Button>
+                                <Button Command="{Binding UserViewModel.LastPageCommand}" 
+                                        Padding="10,5" IsEnabled="{Binding UserViewModel.HasNextPage}">
+                                    <Button.Content>
+                                        <translation:TranslationExtension Key="pagination.last"/>
+                                    </Button.Content>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                        
+                        <!-- Status Bar -->
+                        <TextBlock Grid.Row="3" 
+                                   Margin="0,5,0,0" 
+                                   VerticalAlignment="Center">
+                            <TextBlock.Inlines>
+                                <Run>
+                                    <Run.Text>
+                                        <translation:TranslationExtension Key="users.total"/>
+                                    </Run.Text>
+                                </Run>
+                                <Run Text=": "/>
+                                <Run>
+                                    <Run.Text>
+                                        <Binding Path="UserViewModel.TotalCount" Mode="OneWay"/>
+                                    </Run.Text>
+                                </Run>
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </Grid>
+                </GroupBox>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

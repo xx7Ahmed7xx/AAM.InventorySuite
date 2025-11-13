@@ -1,0 +1,39 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>{{ translate.translate('login.appTitle') }}</h1>
+      <select [(ngModel)]="currentLocale" (change)="changeLanguage()" class="language-selector" name="language">
+        <option value="en">EN</option>
+        <option value="ar">AR</option>
+      </select>
+    </div>
+    <h2>{{ translate.translate('login.title') }}</h2>
+    
+    <form (ngSubmit)="login()">
+      <div class="form-group">
+        <label>{{ translate.translate('login.username') }}</label>
+        <input type="text" [(ngModel)]="credentials.username" name="username" required autofocus>
+      </div>
+      
+      <div class="form-group">
+        <label>{{ translate.translate('login.password') }}</label>
+        <input type="password" [(ngModel)]="credentials.password" name="password" required>
+      </div>
+      
+      <div *ngIf="error" class="error-message">
+        {{ error }}
+      </div>
+      
+      <button type="submit" class="btn btn-primary" [disabled]="loading">
+        {{ loading ? translate.translate('login.loggingIn') : translate.translate('login.title') }}
+      </button>
+    </form>
+    
+    <div class="login-hint">
+      <p>{{ translate.translate('login.defaultCredentials') }}</p>
+      <p><strong>{{ translate.translate('login.defaultUsername') }}</strong></p>
+      <p><strong>{{ translate.translate('login.defaultPassword') }}</strong></p>
+    </div>
+  </div>
+</div>
+
