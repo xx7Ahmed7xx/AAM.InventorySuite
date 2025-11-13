@@ -5,6 +5,23 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>AAM.Inventory.Core.Domain</RootNamespace>
+    <PackageId>AAM.Inventory.Core.Domain</PackageId>
+    <Version>1.0.1</Version>
+    <Authors>AAM</Authors>
+    <Company>AAM</Company>
+    <Product>Inventory Suite - Domain Layer</Product>
+    <Description>Domain models, entities, and interfaces for the Inventory Suite. This package contains the core domain layer with no external dependencies, making it perfect for NuGet distribution.</Description>
+    <PackageTags>inventory;domain;entities;ddd;clean-architecture</PackageTags>
+    <RepositoryUrl>https://github.com/xx7Ahmed7xx/AAM.InventorySuite</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>

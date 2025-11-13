@@ -4,6 +4,8 @@
 [![Angular](https://img.shields.io/badge/Angular-18+-DD0031?logo=angular)](https://angular.io/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Web-lightgrey)]()
+[![NuGet](https://img.shields.io/nuget/v/AAM.Inventory.Core.Domain.svg)](https://www.nuget.org/packages/AAM.Inventory.Core.Domain/)
+[![NuGet](https://img.shields.io/nuget/v/AAM.Inventory.Core.Application.svg)](https://www.nuget.org/packages/AAM.Inventory.Core.Application/)
 
 A modern, cross-platform inventory management system built with .NET 8, featuring both a WPF desktop application and an Angular web interface. The core business logic is designed to be reusable as NuGet packages.
 
@@ -78,7 +80,7 @@ InventorySuite/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/AAM.InventorySuite.git
+   git clone https://github.com/xx7Ahmed7xx/AAM.InventorySuite.git
    cd AAM.InventorySuite
    ```
 
@@ -153,12 +155,45 @@ The Angular app will be available at `http://localhost:4200`.
 
 ## 📦 NuGet Packages
 
-The core libraries are designed to be published as NuGet packages:
+The core libraries are available as NuGet packages and can be used independently in your projects:
 
-- **Inventory.Core.Domain**: Domain models and interfaces
-- **Inventory.Core.Application**: Business logic and use cases
+### [AAM.Inventory.Core.Domain](https://www.nuget.org/packages/AAM.Inventory.Core.Domain/)
 
-To pack the libraries:
+[![NuGet](https://img.shields.io/nuget/v/AAM.Inventory.Core.Domain.svg)](https://www.nuget.org/packages/AAM.Inventory.Core.Domain/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/AAM.Inventory.Core.Domain.svg)](https://www.nuget.org/packages/AAM.Inventory.Core.Domain/)
+
+Pure domain models, entities, and interfaces with **no external dependencies**. Perfect for Clean Architecture and DDD implementations.
+
+**Install via .NET CLI:**
+```bash
+dotnet add package AAM.Inventory.Core.Domain
+```
+
+**Install via Package Manager:**
+```
+Install-Package AAM.Inventory.Core.Domain
+```
+
+### [AAM.Inventory.Core.Application](https://www.nuget.org/packages/AAM.Inventory.Core.Application/)
+
+[![NuGet](https://img.shields.io/nuget/v/AAM.Inventory.Core.Application.svg)](https://www.nuget.org/packages/AAM.Inventory.Core.Application/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/AAM.Inventory.Core.Application.svg)](https://www.nuget.org/packages/AAM.Inventory.Core.Application/)
+
+Business logic, use cases, DTOs, and validators. Depends on `AAM.Inventory.Core.Domain`.
+
+**Install via .NET CLI:**
+```bash
+dotnet add package AAM.Inventory.Core.Application
+```
+
+**Install via Package Manager:**
+```
+Install-Package AAM.Inventory.Core.Application
+```
+
+### Building Packages Locally
+
+To build the packages from source:
 
 ```bash
 dotnet pack src/Inventory.Core.Domain/Inventory.Core.Domain.csproj -c Release
@@ -229,49 +264,49 @@ The solution follows Clean Architecture principles:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Presentation Layer                    │
+│                    Presentation Layer                   │
 │  ┌──────────────────┐      ┌──────────────────┐         │
 │  │  Inventory.API   │      │ Inventory.Desktop│         │
 │  │  (ASP.NET Core)  │      │     (WPF)        │         │
 │  └──────────────────┘      └──────────────────┘         │
-│                                                           │
-│  ┌──────────────────┐                                     │
-│  │  inventory-web   │                                    │
-│  │    (Angular)      │                                    │
-│  └──────────────────┘                                     │
+│                                                         │
+│  ┌──────────────────┐                                   │
+│  │  inventory-web   │                                   │
+│  │    (Angular)     │                                   │
+│  └──────────────────┘                                   │
 └─────────────────────────────────────────────────────────┘
                         │
                         ▼
 ┌─────────────────────────────────────────────────────────┐
-│                  Application Layer                       │
-│  ┌──────────────────────────────────────────────┐        │
-│  │  Inventory.Core.Application                 │        │
-│  │  - Services (Product, Category, Stock, etc.) │        │
-│  │  - DTOs                                      │        │
-│  │  - Validators (FluentValidation)             │        │
-│  └──────────────────────────────────────────────┘        │
+│                  Application Layer                      │
+│  ┌──────────────────────────────────────────────┐       │
+│  │  Inventory.Core.Application                  │       │
+│  │  - Services (Product, Category, Stock, etc.) │       │
+│  │  - DTOs                                      │       │
+│  │  - Validators (FluentValidation)             │       │
+│  └──────────────────────────────────────────────┘       │
 └─────────────────────────────────────────────────────────┘
                         │
                         ▼
 ┌─────────────────────────────────────────────────────────┐
-│                    Domain Layer                          │
-│  ┌──────────────────────────────────────────────┐        │
-│  │  Inventory.Core.Domain                      │        │
-│  │  - Entities (Product, Category, User, etc.) │        │
-│  │  - Interfaces (Repositories)                │        │
-│  │  - Enums                                     │        │
-│  └──────────────────────────────────────────────┘        │
+│                    Domain Layer                         │
+│  ┌──────────────────────────────────────────────┐       │
+│  │  Inventory.Core.Domain                       │       │
+│  │  - Entities (Product, Category, User, etc.)  │       │
+│  │  - Interfaces (Repositories)                 │       │
+│  │  - Enums                                     │       │
+│  └──────────────────────────────────────────────┘       │
 └─────────────────────────────────────────────────────────┘
                         │
                         ▼
 ┌─────────────────────────────────────────────────────────┐
-│                Infrastructure Layer                      │
-│  ┌──────────────────────────────────────────────┐        │
-│  │  Inventory.Core.Infrastructure               │        │
-│  │  - Entity Framework Core                    │        │
-│  │  - Repository Implementations                │        │
-│  │  - Database Context                         │        │
-│  └──────────────────────────────────────────────┘        │
+│                Infrastructure Layer                     │
+│  ┌──────────────────────────────────────────────┐       │
+│  │  Inventory.Core.Infrastructure               │       │
+│  │  - Entity Framework Core                     │       │
+│  │  - Repository Implementations                │       │
+│  │  - Database Context                          │       │
+│  └──────────────────────────────────────────────┘       │
 └─────────────────────────────────────────────────────────┘
 ```
 

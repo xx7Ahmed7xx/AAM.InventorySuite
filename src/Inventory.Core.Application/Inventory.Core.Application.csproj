@@ -5,7 +5,24 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>AAM.Inventory.Core.Application</RootNamespace>
+    <PackageId>AAM.Inventory.Core.Application</PackageId>
+    <Version>1.0.1</Version>
+    <Authors>AAM</Authors>
+    <Company>AAM</Company>
+    <Product>Inventory Suite - Application Layer</Product>
+    <Description>Business logic, use cases, DTOs, and validators for the Inventory Suite. This package contains the application layer with business logic and depends on AAM.Inventory.Core.Domain.</Description>
+    <PackageTags>inventory;application;business-logic;dto;validation;fluentvalidation</PackageTags>
+    <RepositoryUrl>https://github.com/xx7Ahmed7xx/AAM.InventorySuite</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.9.0" />
